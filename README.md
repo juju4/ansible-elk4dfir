@@ -3,12 +3,11 @@
 # ELK for DFIR ansible role
 
 Ansible role to setup ELK (v5.x) in Data Forensics Incident Response mode.
-Preload multiple configurations like
-    - https://github.com/harrytruman/logstash-vmware.git
-    - https://github.com/cvandeplas/ELK-forensics.git
-    - https://github.com/sysforensics/LogstashConfigs.git
-    - https://github.com/philhagen/sof-elk.git
-with sometimes adaptations.
+Preloaded multiple configurations with sometimes adaptations or not:
+* https://github.com/harrytruman/logstash-vmware.git
+* https://github.com/cvandeplas/ELK-forensics.git
+* https://github.com/sysforensics/LogstashConfigs.git
+* https://github.com/philhagen/sof-elk.git
 
 ## Requirements & Dependencies
 
