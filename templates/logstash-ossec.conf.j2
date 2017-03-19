@@ -1,0 +1,40 @@
+## http://vichargrave.com/improved-ossec-log-parsing-with-logstash/
+
+input {
+# stdin{}
+  udp {
+     port => 9000
+     type => "syslog"
+  }
+}
+  
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_host} %{DATA:syslog_program}: Alert Level: %{NONNEGINT:Alert_Level}; Rule: %{NONNEGINT:Rule} - %{DATA:Description}; Location: %{DATA:Location}; (user: %{USER:User};%{SPACE})?(srcip: %{IP:Src_IP};%{SPACE})?(user: %{USER:User};%{SPACE})?(dstip: %{IP:Dst_IP};%{SPACE})?(src_port: %{NONNEGINT:Src_Port};%{SPACE})?(dst_port: %{NONNEGINT:Dst_Port};%{SPACE})?%{GREEDYDATA:Details}" }
+      add_field => [ "ossec_server", "%{host}" ]
+    }
+    mutate {
+      remove_field => [ "message","syslog_timestamp", "syslog_program", "syslog_host", "syslog_message", "syslog_pid", "@version", "type", "host" ]
+    }
+  }
+}
+  
+output {
+#   stdout {
+#     codec => rubydebug
+#   }
+   elasticsearch {
+            action => "index"
+            #host => "localhost"
+            #index => "syslog-%{+YYYY.MM.dd}"
+            workers => 1
+## https://discuss.elastic.co/t/logstash-error-messages-got-error-to-send-bulk-of-actions-and-failed-to-flush-outgoing-items/24215
+## https://discuss.elastic.co/t/failed-to-flush-outgoing-items/2215/3
+## https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html#plugins-outputs-elasticsearch-cluster
+            hosts => [ "127.0.0.1" ]
+#            cluster => "elasticsearch"
+#            protocol => "transport"
+    }
+}
+

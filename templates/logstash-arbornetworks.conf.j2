@@ -1,0 +1,91 @@
+## $ sudo install -m 644 file /etc/logstash/conf.d/
+## $ cat /challenges/b/Arbor-20150602-All-Alerts-5G.xml | xmllint --format - | /opt/logstash/bin/logstash -f /vagrant/logstash-arbornetworks.conf
+input {
+  ## debug ?
+#  stdin {}
+  ## https://www.elastic.co/guide/en/logstash/current/plugins-inputs-file.html#plugins-inputs-file-discover_interval
+  ## default discover_interval: 15sec
+  file {
+    type => "arbor"
+    path => "{{ elk4dfir_manual_parsing_dir }}/Arbor-*.xml"
+    ## if debugging, force re-read
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+## https://www.elastic.co/guide/en/logstash/current/plugins-filters-xml.html
+## http://stackoverflow.com/questions/25668970/cant-parse-xml-input-with-logstash-filter
+  if [type] == "arbor" {
+#    multiline {
+#        pattern => "^\s\s\s\s|\<\/alert\>"
+#        what => "previous"
+#    }
+    xml {
+#        store_xml => "false"
+        source => "message"
+        target => "message_parsed"
+        add_tag => ["xml_parsed"]
+        #remove_namespaces => true
+        xpath => [
+            "/peakflow/alert-list/alert/@id","alert_id",
+            "/peakflow/alert-list/alert/@type","alert_type",
+            "/peakflow/alert-list/alert/device/@name","device_name",
+            "/peakflow/alert-list/alert/importance/@level","importance",
+            "/peakflow/alert-list/alert/resource/name/text()","res_name",
+            "/peakflow/alert-list/alert/resource/ip/text()","res_ip",
+            "/peakflow/alert-list/alert/classification/text()","classification",
+            "/peakflow/alert-list/alert/duration/@start","time_start",
+            "/peakflow/alert-list/alert/duration/@stop","time_stop",
+            "/peakflow/alert-list/alert/duration/@length","time_len",
+            "/peakflow/alert-list/alert/rate_unit/text()","rate_unit",
+            "/peakflow/alert-list/alert/direction/text()","direction",
+            "/peakflow/alert-list/alert/severity/@threshold","severity_threshold",
+            "/peakflow/alert-list/alert/severity/@pct","severity_pct",
+            "/peakflow/alert-list/alert/severity/@unit","severity_unit",
+            "/peakflow/alert-list/alert/impact/@bps","impact_bps",
+            "/peakflow/alert-list/alert/impact/@pps","impact_pps",
+## contains if mitigation applied, or profiled detection info
+            "/peakflow/alert-list/alert/annotation-list/annotation/section-list/section/text()","annotation"
+        ]
+    }
+    mutate {
+        add_tag => "%{type}"
+    }
+    date { 
+      match => [ "time_start", "UNIX" ]
+    }
+    date { 
+      match => [ "time_stop", "UNIX" ]
+    }
+    geoip {
+        source => "res_ip"
+        target => "geoip"
+        database => "/usr/local/share/GeoIP/GeoLite2-City.mmdb"
+        add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+        add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    mutate {
+        convert => [ "[geoip][coordinates]", "float"]
+    }
+    ## https://www.elastic.co/guide/en/logstash/current/plugins-filters-cidr.html
+  #  cidr {
+  #      add_tag => [ "linklocal" ]
+  #      address => [ "%{clientip}" ]
+  #      network => [ "169.254.0.0/16", "fe80::/64" ]
+  #  }
+  }
+}
+
+output {  
+    if [type] == "arbor" {
+        stdout { codec => rubydebug }
+#        elasticsearch { 
+#            action => "index"
+#            host => "localhost"
+#            index => "arbor-%{+YYYY.MM.dd}"
+#            workers => 1
+#        }
+    }
+}

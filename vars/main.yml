@@ -1,0 +1,12 @@
+---
+
+elasticsearch_repo_version: 5.x 
+logstash_repo_version: 5.x 
+kibana_repo_version: 5.x
+## configure inside elk4dfir or check aligned
+logstash_config: []
+logstash_filters: []
+logstash_listen_port_rsyslog: ''
+logstash_install_plugins:
+    - logstash-input-beats
+    - logstash-filter-elasticsearch

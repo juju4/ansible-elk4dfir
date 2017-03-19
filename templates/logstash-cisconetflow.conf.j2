@@ -1,0 +1,28 @@
+## from http://blogs.cisco.com/security/step-by-step-setup-of-elk-for-netflow-analytics (Dec 2014)
+## https://www.elastic.co/guide/en/logstash/current/plugins-codecs-netflow.html
+
+input {
+  udp {
+    port => 9995
+    codec => netflow {
+      versions => [5, 9]
+    }
+    type => netflow
+  }
+}
+
+output {
+  stdout { codec => rubydebug }
+  if ( [host] =~ "10\.1\.1[12]\.1" ) {
+    elasticsearch {
+      index => "logstash_netflow-%{+YYYY.MM.dd}"
+      hosts => [ "localhost" ]
+    }
+  } else {
+    elasticsearch {
+      index => "logstash-%{+YYYY.MM.dd}"
+      hosts => [ "localhost" ]
+    }
+  }
+}
+

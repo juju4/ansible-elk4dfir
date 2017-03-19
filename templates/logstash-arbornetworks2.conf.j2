@@ -1,0 +1,85 @@
+## $ sudo install -m 644 grok-sinkhole /etc/logstash/conf.d/
+input {
+  ## debug ?
+#  stdin {}
+  ## https://www.elastic.co/guide/en/logstash/current/plugins-inputs-file.html#plugins-inputs-file-discover_interval
+  ## default discover_interval: 15sec
+  file {
+    type => "arbor"
+    path => "{{ elk4dfir_manual_parsing_dir }}/arbor-soap-extract-alerts-*.csv"
+    ## if debugging, force re-read
+    start_position => "beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+
+filter {
+  if [type] == "sinkhole" {
+    csv {
+      columns => ["alertid","attacktype","importance","classification","ManagedObject","targetIP","direction","threshold","percent","unit","bps","Gbps","pps","Kpps","ongoing_status","start_time","end_time","duration","Hduration" ]
+      separator => ","
+    }
+    ## skip first line/column name
+    if [alertid] == "CATEGORY" {
+      drop { }
+    }
+    if [message] =~ /^#/ {
+      drop { }
+    }
+#    mutate {
+#        remove_field => [ "Trash" ]
+#    }
+    date { 
+      locale => "en"
+      match => [ "start_time", "YYYY-MM-dd'T'HH:mm:ss" ]
+      timezone => "US/Eastern"
+    }
+    date { 
+      locale => "en"
+      match => [ "end_time", "YYYY-MM-dd'T'HH:mm:ss" ]
+      timezone => "US/Eastern"
+    }
+    geoip {
+        source => "targetIP"
+        target => "geoip"
+        database => "/home/vagrant/GeoLiteCity.dat"
+        add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+        add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+    }
+    mutate {
+        convert => [ "[geoip][coordinates]", "float"]
+    }
+#    geoip { 
+#    	source => "FQDN"
+#    }
+    ## https://www.elastic.co/guide/en/logstash/current/plugins-filters-cidr.html
+  #  cidr {
+  #      add_tag => [ "linklocal" ]
+  #      address => [ "%{clientip}" ]
+  #      network => [ "169.254.0.0/16", "fe80::/64" ]
+  #  }
+#    ## http://notes.asd.me.uk/2014/11/10/cleaning-up-mac-addresses-in-logstash/
+#    sanitize_mac {
+#        match => { "client_mac" => "client_mac_sanitized" }
+#        fixcase => "lower"
+#        separator => ":"
+#    }
+##  http://engineering.laterooms.com/enriching-logs-with-logstash/  (split url)
+#    grok { 
+#        match => [ "url_path", "^(?:\/(?<url_language>en|de|es|it|fr))?(?:\/p(?<url_partner>[0-9]+))?(?:\/pv(?<url_partner_value>[0-9a-zA-Z]+))?(?<url_page>.*)$" ] 
+#    }
+
+  }
+}
+
+output {  
+    if [type] == "arbor" {
+        stdout { codec => rubydebug }
+        elasticsearch { 
+            action => "index"
+            host => "localhost"
+            index => "arbor-%{+YYYY.MM.dd}"
+            workers => 1
+        }
+    }
+}

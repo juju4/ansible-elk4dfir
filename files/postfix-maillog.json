@@ -1,0 +1,55 @@
+{
+    "template" : "maillog-*",
+    "order" : 1,
+    "settings" : {
+        "number_of_shards" : 2,
+        "index.refresh_interval" : "90s"
+    },
+    "mappings" : {
+        "maillog" : {
+            "properties" : {
+                "reason" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "saslusername" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "postfix_action" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "relayip" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "messageid" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "pid" : { "index": "not_analyzed", "doc_values": true, "type" : "long" },
+                "remote" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "type" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "qid" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "local" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "result" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "path" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "file" : { "index": "not_analyzed", "type" : "string" },
+                "queuestatus" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "smtp_response" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "@version" : { "type" : "string" },
+                "host" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "client" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "from" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "timestamp" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "nrcpt" : { "index": "not_analyzed", "doc_values": true, "type" : "long" },
+                "responsecode" : { "index": "not_analyzed", "doc_values": true, "type" : "long" },
+                "offset" : { "index": "not_analyzed", "doc_values": true, "type" : "long" },
+                "relayhost" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "logsource" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "message" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "orig_to" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "command" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "tags" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "helo" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "saslmethod" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "component" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "@timestamp" : { "format" : "dateOptionalTime", "type" : "date" },
+                "remotehost" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "size" : { "index": "not_analyzed", "doc_values": true, "type" : "long" },
+                "anvilstatistic" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "proto" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "bouncequeueid" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "to" : { "index": "not_analyzed", "doc_values": true, "type" : "string" },
+                "dsn" : { "index": "not_analyzed", "doc_values": true, "type" : "string" }
+            }
+        }
+    }
+}
+

@@ -1,0 +1,96 @@
+---
+
+elk4dfir_examples: /usr/local/share/elk4dfir/examples
+elk4dfir_patterns_dir: '/etc/logstash/patterns'
+elk4dfir_templates_dir: '/etc/logstash/templates'
+## where to put files you want to add manually?
+elk4dfir_manual_parsing_dir: '/usr/local/logstash-syslog'
+elk4dfir_maxmind_path: '/var/maxmind'
+## if enabled, will push some logs into elk so we can validate them with serverspec
+elk4dfir_testing: true
+
+elk4dfir_gitrepos:
+    - https://github.com/harrytruman/logstash-vmware.git
+    - https://github.com/cvandeplas/ELK-forensics.git
+#    - https://github.com/Yelp/elastalert.git
+    - https://github.com/sysforensics/LogstashConfigs.git
+## use fork for elk5 compatibility
+#    - https://github.com/philhagen/sof-elk.git
+    - https://github.com/juju4/sof-elk.git
+
+#https://www.nginx.com/blog/monitoring-nginx-plus-statistics-elk/
+#http://logz.io/blog/nginx-log-analysis/
+#https://app.logz.io/#/apps?q=nginx
+#https://miteshshah.github.io/linux/elk/how-to-monitor-nginx-logs-on-elk-stack/
+#ssh kibana
+#https://gist.github.com/regit/9208314da23e2c4b7d8d
+#https://gist.github.com/ssplatt/dfa7743df9e326360662
+#https://www.elastic.co/blog/use-elk-display-security-datasources-iptables-kippo-honeypot
+#https://blog.rootshell.be/2014/08/28/check-point-firewall-logs-and-logstash-elk-integration/
+
+#https://www.elastic.co/products/beats
+
+## templates/
+elk4dfir_config_files:
+    - logstash-arbornetworks.conf
+    - logstash-checkpoint-opsec.conf
+    - logstash-cisconetflow.conf
+    - logstash-local-syslog.conf
+    - logstash-nginx.conf
+    - logstash-nginx-error.conf
+    - logstash-osquery.conf
+    - logstash-ossec.conf
+    - logstash-rsyslog.conf
+    - logstash-exim.conf
+    - logstash-postfix.conf
+
+elk4dfir_config_enable:
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/010-syslog-input.conf"
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/100-syslog.conf"
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/110-syslog_squidlog.conf"
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/120-syslog_dhcp.conf"
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/130-syslog_bindquerylog.conf"
+#    - "{{ elk4dfir_examples }}/sof-elk/configfiles/150-syslog_ssh.conf"
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/160-syslog_pam.conf"
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/198-syslog_default.conf"
+    - "{{ elk4dfir_examples }}/sof-elk/configfiles/199-syslog_final.conf"
+    - "{{ elk4dfir_examples }}/logstash-osquery.conf"
+    - "{{ elk4dfir_examples }}/logstash-exim.conf"
+
+#elk4dfir_config_disable: []
+elk4dfir_config_disable:
+## redundant with 010-syslog-input.conf
+    - 01-beats-input.conf
+    - 02-local-syslog-input.conf
+## Not compatible w v5, change of syntax for multiline: https://discuss.elastic.co/t/can-not-find-the-multine-plug-in-in-my-logstash-5-1-2/73081/4
+    - 14-solr.conf
+
+elk4dfir_config_dashboard_enable: []
+
+elk4dfir_extra_dirs:
+    - "{{ elk4dfir_examples }}"
+    - /usr/local/logstash-syslog/2017
+    - /usr/local/logstash-syslog/checkpoint
+    - /usr/local/logstash-syslog/exim
+    - /usr/local/logstash-syslog/postfix
+    - /usr/local/logstash-syslog/osquery
+    - /usr/local/logstash-nfarch
+    - /usr/local/logstash-httpd
+    - /usr/local/logstash-passivedns
+    - /etc/logstash/patterns
+    - /etc/logstash/templates
+## sincedb
+    - /var/db/logstash
+
+elk4dfir_extra_files:
+    - { f: 'postfix-maillog.json', d: "{{ elk4dfir_templates_dir }}/postfix-maillog.json" }
+    - { f: 'postfix_grok_pattern', d: "{{ elk4dfir_patterns_dir }}/postfix_grok_pattern" }
+
+#elk4dfir_logstash_plugins: []
+#elk4dfir_logstash_plugins: = use geerlingguy.logstash logstash_install_plugins (in vars/main.yml)
+## required for sof-elk 010-syslog-input.conf, https://www.elastic.co/guide/en/logstash/current/plugins-inputs-relp.html
+## FIXME! Could not find gem 'logstash (< 2.0.0, >= 1.4.0) java', which is required by gem 'logstash-input-relp (>= 0) java', in any of the sources.
+#    - logstash-input-relp
+## https://www.elastic.co/guide/en/logstash/current/plugins-filters-elasticsearch.html
+#    - logstash-filter-elasticsearch
+

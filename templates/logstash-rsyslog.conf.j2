@@ -1,0 +1,103 @@
+## https://gist.github.com/untergeek/0373ee85a41d03ae1b78
+input {
+  udp {
+    port => 10514
+    codec => "json"
+    type => "syslog"
+  }
+}
+
+filter {
+  # This replaces the host field (UDP source) with the host that generated the message (sysloghost)
+  if [sysloghost] {
+    mutate {
+      replace => [ "host", "%{sysloghost}" ]
+      remove_field => "sysloghost" # prune the field after successfully replacing "host"
+    }
+  }
+
+### https://gist.github.com/juanje/3081998
+#  grok {
+#    type => "linux-syslog"
+#    pattern => "%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:host_target} sshd\[%{BASE10NUM}\]: Failed password for invalid user %{USERNAME:username} from %{IP:src_ip} port %{BASE10NUM:port} ssh2"
+#    add_tag => "ssh_brute_force_attack"
+#  }
+#  grok {
+#    type => "linux-syslog"
+#    pattern => "%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:host_target} sudo: pam_unix\(sudo:auth\): authentication failure; logname=%{USERNAME:logname} uid=%{BASE10NUM:uid} euid=%{BASE10NUM:euid} tty=%{TTY:tty} ruser=%{USERNAME:ruser} rhost=(?:%{HOSTNAME:remote_host}|\s*) user=%{USERNAME:user}"
+#    add_tag => "sudo_auth_failure"
+#  }
+#  grok {
+#    type => "linux-syslog"
+#    pattern => "%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:host_target} sshd\[%{BASE10NUM}\]: Failed password for %{USERNAME:username} from %{IP:src_ip} port %{BASE10NUM:port} ssh2"
+#    add_tag => "ssh_failed_login"
+#  }
+#  
+#  grok {
+#    type => "linux-syslog"
+#    pattern => "%{SYSLOGTIMESTAMP:timestamp} %{HOSTNAME:host_target} sshd\[%{BASE10NUM}\]: Accepted password for %{USERNAME:username} from %{IP:src_ip} port %{BASE10NUM:port} ssh2"
+#    add_tag => "ssh_sucessful_login"
+#  }
+
+## https://gist.github.com/juanje/3081998
+  if [type] == "auth" and [program] == "sshd" {
+    grok {
+        match => {
+            "message" => "Failed password for %{DATA:user} from %{IP:ip} port %{INT:port} ssh2"
+        }
+        add_tag => "ssh_failed"
+        break_on_match => false
+    }
+  }
+  if "ssh_failed" in [tags] {
+    metrics { # toutes les 60 secondes, on relève les compteurs
+        meter => [ "fails" ]
+        add_tag => "metric"
+        flush_interval => 60
+        clear_interval => 60
+        add_field => ["source", "beuha"] # it's a bug, I should use this : "%{[logsource]}"]
+    }
+    geoip {
+        source => "ip"
+        database => "/var/maxmind/GeoLiteCity.dat"
+    }
+    dns {
+        reverse => ["ip"]
+    }
+  }
+
+  geoip {
+    source => "clientip"
+    target => "geoip"
+    database => "/var/maxmind/GeoLiteCity.dat"
+    add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
+    add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
+  }
+  mutate {
+    add_field => [ "src_ip", "%{clientip}" ]
+    convert => [ "[geoip][coordinates]", "float" ]
+  }
+}
+
+output {
+    ## http://kartar.net/2014/09/when-logstash-and-syslog-go-wrong/
+    if [type] == "syslog" and "_grokparsefailure" in [tags] {
+        file { path => "/var/log/failed_syslog_events-%{+YYYY-MM-dd}" }
+    }
+    if [type] == "linux-syslog" {
+        #stdout { codec => rubydebug }
+        elasticsearch { 
+            action => "index"
+            #host => "localhost"
+            index => "syslog-%{+YYYY.MM.dd}"
+            workers => 1
+## https://discuss.elastic.co/t/logstash-error-messages-got-error-to-send-bulk-of-actions-and-failed-to-flush-outgoing-items/24215
+## https://discuss.elastic.co/t/failed-to-flush-outgoing-items/2215/3
+## https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html#plugins-outputs-elasticsearch-cluster
+            hosts => [ "127.0.0.1" ]
+#            cluster => "elasticsearch"
+#            protocol => "transport"
+        }
+    }
+}
+

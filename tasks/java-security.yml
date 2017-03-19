@@ -1,0 +1,20 @@
+---
+
+## logstash speedup and better entropy
+## https://github.com/elastic/logstash/issues/1511
+## https://github.com/elastic/logstash/issues/5491
+## https://github.com/elastic/logstash/issues/5507
+## http://www.2uo.de/myths-about-urandom/
+
+- name: ensure rng-tools are present
+  package: name=rng-tools state=present
+
+- name: force /dev/urandom as entropy source for java
+  lineinfile:
+    dest: "{{ java_security }}"
+    regexp: '^securerandom.source=file:'
+    line: 'securerandom.source=file:/dev/urandom'
+    backup: yes
+    create: yes
+  ignore_errors: true
+    

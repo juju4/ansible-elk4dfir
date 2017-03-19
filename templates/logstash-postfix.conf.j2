@@ -1,0 +1,46 @@
+## from https://gist.githubusercontent.com/TinLe/106e26c00796f37d71de/raw/80fe68716f75f45a01af54c899ab5b8ab35f4a4d/logstash.conf, http://blog.tinle.org/?p=459
+input {
+  file {
+    path => "{{ elk4dfir_manual_parsing_dir }}/postfix/maillog*"
+    exclude => "*.gz"
+    start_position => "beginning"
+    type => "maillog"
+  }
+}
+filter {
+  if [type] == "maillog" {
+    grok {
+      patterns_dir => ["{{ elk4dfir_patterns_dir }}"]
+      match => { "message" => ["%{PF}", "%{DOVECOT}" ] }
+    }
+    date {
+      match => [ "timestamp", "MMM dd HH:mm:ss", "MMM d HH:mm:ss" ]
+    }
+  }
+  # I wanted to monitor metrics and health of logstash
+  metrics {
+    meter => "events"
+    add_tag => "metric"
+  }
+}
+output {
+  if [type] == "maillog" {
+    elasticsearch {
+      index => "maillog-%{+YYYY.MM.dd}"
+      hosts => [ "localhost" ]
+      flush_size => 1000
+      manage_template => true
+      template_overwrite => true
+      template => "{{ elk4dfir_templates_dir }}/postfix-maillog.json"
+      template_name => "maillog"
+    }
+  }
+  if "metric" in [tags] {
+    stdout {
+      codec => line {
+        format => "rate: %{events.rate_1m}"
+      }
+    }
+  }
+}
+

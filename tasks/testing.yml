@@ -1,0 +1,16 @@
+---
+
+- name: copy local syslog into manual queue
+  copy:
+    src: "{{ syslog_src }}"
+    dest: "{{ elk4dfir_manual_parsing_dir }}/{{ ansible_date_time.year }}/{{ syslog_src | basename }}"
+    remote_src: true
+
+## have separate repo for example logs?
+- name: copy logs
+  copy:
+    src: "{{ item.s }}"
+    dest: "{{ item.d }}"
+  with_items:
+    - { s: 'logs-exim4-mainlog', d: "{{ elk4dfir_manual_parsing_dir }}/exim" }
+    

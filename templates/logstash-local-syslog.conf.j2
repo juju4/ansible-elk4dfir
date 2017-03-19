@@ -1,0 +1,38 @@
+
+## https://home.regit.org/2014/01/a-bit-of-logstash-cooking/
+input {
+  file {
+    type => "linux-syslog"
+#    path => [ "/var/log/syslog", "/var/log/daemon.log", "/var/log/auth.log", "/var/log/mail.info", "/var/log/mail.log" ]
+## Ubuntu 14.04
+    path => [ "/var/log/syslog", "/var/log/auth.log", "/var/log/kern.log", "/var/log/mail.log", "/var/log/checksecurity.log", "/var/log/dpkg.log" ]
+  }
+}
+filter {
+  if [type] == "linux-syslog" {
+      grok {
+        match => { "message" => "Accepted %{WORD:auth_method} for %{USER:username} from %{IP:src_ip} port %{INT:src_port} ssh2" }
+      }
+      grok {
+        match => { "message" => "Invalid user %{USER:username} from %{IP:src_ip}" }
+      }
+  }
+}
+
+output {  
+    if [type] == "linux-syslog" {
+        #stdout { codec => rubydebug }
+        elasticsearch { 
+            action => "index"
+            #host => "localhost"
+            index => "syslog-%{+YYYY.MM.dd}"
+            workers => 1
+## https://discuss.elastic.co/t/logstash-error-messages-got-error-to-send-bulk-of-actions-and-failed-to-flush-outgoing-items/24215
+## https://discuss.elastic.co/t/failed-to-flush-outgoing-items/2215/3
+## https://www.elastic.co/guide/en/logstash/current/plugins-outputs-elasticsearch.html#plugins-outputs-elasticsearch-cluster
+            hosts => [ "127.0.0.1" ]
+#            cluster => "elasticsearch"
+#            protocol => "transport"
+        }
+    }
+}

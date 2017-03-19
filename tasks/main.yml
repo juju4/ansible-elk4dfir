@@ -1,0 +1,77 @@
+---
+
+- include_vars: main.yml
+- name: Include version-specific variables for Ubuntu.
+  include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
+  when: ansible_distribution == 'Ubuntu'
+- name: Include version-specific variables for RedHat
+  include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
+  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- include: java-security.yml
+
+- name: ensure directories exist
+  file: "dest={{ item }} state=directory mode=0755"
+  with_items: "{{ elk4dfir_extra_dirs }}"
+
+- name: copy extra files
+  copy:
+    src: "{{ item.f }}"
+    dest: "{{ item.d }}"
+    mode: '0644'
+    backup: yes
+  with_items: "{{ elk4dfir_extra_files }}"
+
+- name: copy examples config
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ elk4dfir_examples }}/{{ item }}"
+    mode: '0644'
+    backup: yes
+    validate: '/usr/share/logstash/bin/logstash -f %s -t'
+  with_items: "{{ elk4dfir_config_files }}"
+
+- name: git clone examples config repositories
+  git:
+    repo: "{{ item }}"
+    dest: "{{ elk4dfir_examples }}/{{ item | regex_replace('^.*/([^/].*)$', '\\1') | regex_replace('.git$', '') }}"
+    force: no
+  with_items: "{{ elk4dfir_gitrepos }}"
+  become: yes
+  ignore_errors: true
+
+- name: sof-elk symlink
+  file: "src={{ elk4dfir_examples }}/sof-elk dest=/usr/local/sof-elk state=link"
+
+- name: enable some configuration for logstash
+  file: "src={{ item }} dest=/etc/logstash/conf.d/{{ item | basename }} state=link"
+  with_items: "{{ elk4dfir_config_enable }}"
+  notify:
+    - restart logstash
+  register: conf1
+
+- name: disable some configuration for logstash
+  file: "dest=/etc/logstash/conf.d/{{ item | basename }} state=absent"
+  with_items: "{{ elk4dfir_config_disable }}"
+  notify:
+    - restart logstash
+  register: conf2
+
+- name: validate full configuration for logstash
+  command: "/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/ -t"
+  when: (conf1 is defined and conf1.changed) or (conf2 is defined and conf2.changed)
+
+## Maxmind role adds symlink
+#- name: update logstash config
+#  replace:
+#    dest: "{{ item.d }}"
+#    regexp: "{{ item.re }}"
+#    replace: "{{ item.rep }}"
+#    backup: yes
+#  with_items:
+#    - { d: "{{ elk4dfir_examples }}/sof-elk/configfiles/150-syslog_ssh.conf", re: '/usr/local/share/GeoIP', rep: "{{ elk4dfir_maxmind_path }}" }
+#    - { d: "{{ elk4dfir_examples }}/sof-elk/configfiles/198-syslog_default.conf", re: '/usr/local/share/GeoIP', rep: "{{ elk4dfir_maxmind_path }}" }
+
+- include: testing.yml
+  when: elk4dfir_testing
+

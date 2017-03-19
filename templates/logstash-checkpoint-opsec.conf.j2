@@ -1,0 +1,23 @@
+## https://blog.rootshell.be/2014/08/28/check-point-firewall-logs-and-logstash-elk-integration/
+## get forwarded config from above link
+
+filter {
+   #
+   # Checkpoint OPSEC/LEA event (lab)
+   #
+   if [type] =~ /^checkpoint/ {
+      grok {
+         match => { "message" => "time=%{DATA:timestamp}\|action=%{WORD:action}\|orig=%{IPORHOST:origin}\|i\/f\_dir=%{WORD:direction}\|i\/f\_name=%{WORD:interface}\|has\_accounting=%{INT:accounting}\|uuid=%{DATA:uuid}\|product=%{DATA:product}\|rule=%{INT:rule}\|rule_uid=%{DATA:rule_uid}\|*src=%{IP:src_ip}\|s_port=%{INT:src_port}\|dst=%{IP:dst_ip}\|service=%{INT:dst_port}\|proto=%{WORD:protocol}" }
+         add_tag => "checkpoint"
+      }
+      mutate {
+         gsub => ["timestamp"," "," "]
+      }
+      if "checkpoint" in [tags] {
+         date {
+            match => [ "timestamp", "ddMMMYYYY HH:mm:ss" ]
+         }
+      }
+   }
+}
+
