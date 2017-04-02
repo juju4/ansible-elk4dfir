@@ -14,6 +14,9 @@
   file: "dest={{ item }} state=directory mode=0755"
   with_items: "{{ elk4dfir_extra_dirs }}"
 
+- name: ensure /var/db/logstash is owned by logstash
+  file: dest=/var/db/logstash owner=logstash
+
 - name: copy extra files
   copy:
     src: "{{ item.f }}"
@@ -30,6 +33,9 @@
     backup: yes
     validate: '/usr/share/logstash/bin/logstash -f %s -t'
   with_items: "{{ elk4dfir_config_files }}"
+
+- name: ensure git is available
+  package: name=git state=present
 
 - name: git clone examples config repositories
   git:

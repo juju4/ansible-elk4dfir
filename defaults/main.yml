@@ -89,7 +89,6 @@ elk4dfir_extra_files:
 #elk4dfir_logstash_plugins: []
 #elk4dfir_logstash_plugins: = use geerlingguy.logstash logstash_install_plugins (in vars/main.yml)
 ## required for sof-elk 010-syslog-input.conf, https://www.elastic.co/guide/en/logstash/current/plugins-inputs-relp.html
-## FIXME! Could not find gem 'logstash (< 2.0.0, >= 1.4.0) java', which is required by gem 'logstash-input-relp (>= 0) java', in any of the sources.
 #    - logstash-input-relp
 ## https://www.elastic.co/guide/en/logstash/current/plugins-filters-elasticsearch.html
 #    - logstash-filter-elasticsearch

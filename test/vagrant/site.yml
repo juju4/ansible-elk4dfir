@@ -1,6 +1,9 @@
 ---
 
 - hosts: all
+  vars:
+    - java_packages: 
+        - openjdk-8-jdk
   roles:
     - juju4.elk4dfir
 

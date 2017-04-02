@@ -17,7 +17,8 @@ It was tested on the following versions:
 
 ### Operating systems
 
-Ubuntu 14.04, 16.04 and Centos7
+Ubuntu 16.04.
+ELK v5 requires Java 8 minimum which is only available on xenial.
 
 ## Example Playbook
 
@@ -56,6 +57,7 @@ $ vagrant ssh
 
 ## Troubleshooting & Known issues
 
+* Remember to give logstash user read permissions when copying files to archives directory.
 * To check elasticsearch contents
 ```
 $ curl http://localhost:9200/_aliases?pretty=1

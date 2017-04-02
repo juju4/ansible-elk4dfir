@@ -10,3 +10,4 @@ logstash_listen_port_rsyslog: ''
 logstash_install_plugins:
     - logstash-input-beats
     - logstash-filter-elasticsearch
+    - logstash-input-relp

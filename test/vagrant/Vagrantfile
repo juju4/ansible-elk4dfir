@@ -5,7 +5,10 @@ VAGRANTFILE_API_VERSION = "2"
 ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-    config.vm.box = "ubuntu/trusty64"
+## using second image to have python2
+    #config.vm.box = "ubuntu/xenial64"
+    config.vm.box = "boxcutter/ubuntu1604"
+    #config.vm.box = "ubuntu/trusty64"
     #config.vm.box = "centos/7"
 
     config.vm.provision :ansible do |ansible|
@@ -23,10 +26,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define "elk4dfir" do |elk4dfir|
         elk4dfir.vm.hostname = "elk4dfir"
         elk4dfir.vm.provider "virtualbox" do |v|
-          v.memory = 2048
+          v.memory = 4096
         end
 ## kibana (user/pass = kibana)
-        elk4dfir.vm.network "forwarded_port", guest: 80, host: 6080
+        elk4dfir.vm.network "forwarded_port", guest: 5601, host: 6080
     end
 
 end
