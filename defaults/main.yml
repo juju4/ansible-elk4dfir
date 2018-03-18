@@ -13,7 +13,6 @@ elk4dfir_gitrepos:
     - https://github.com/harrytruman/logstash-vmware.git
     - https://github.com/cvandeplas/ELK-forensics.git
 #    - https://github.com/Yelp/elastalert.git
-    - https://github.com/sysforensics/LogstashConfigs.git
 ## use fork for elk5 compatibility
 #    - https://github.com/philhagen/sof-elk.git
     - https://github.com/juju4/sof-elk.git
