@@ -44,6 +44,7 @@ Once you ensured all necessary roles are present, You can test with:
 ```
 $ gem install kitchen-ansible kitchen-lxd_cli kitchen-sync kitchen-vagrant
 $ cd /path/to/roles/juju4.elk4dfir
+$ sudo sysctl -w vm.max_map_count=262144
 $ kitchen verify
 $ kitchen login
 $ KITCHEN_YAML=".kitchen.vagrant.yml" kitchen verify
