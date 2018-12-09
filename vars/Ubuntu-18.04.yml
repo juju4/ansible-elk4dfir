@@ -1,0 +1,4 @@
+---
+
+java_security: /etc/java-8-openjdk/security/java.security
+syslog_src: /var/log/syslog
