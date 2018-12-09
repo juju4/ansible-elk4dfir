@@ -20,6 +20,6 @@ galaxy_info:
 dependencies:
   - geerlingguy.java
   - geerlingguy.elasticsearch
-#  - geerlingguy.logstash
+  - geerlingguy.logstash
   - geerlingguy.kibana
   - juju4.maxmind
