@@ -13,4 +13,3 @@
     dest: "{{ item.d }}"
   with_items:
     - { s: 'logs-exim4-mainlog', d: "{{ elk4dfir_manual_parsing_dir }}/exim" }
-    

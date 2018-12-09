@@ -9,8 +9,10 @@ transport:
 driver_config:
     customize:
 #      cpus: 2
-#      memory: 2048	# 1.7
-      memory: 4096	# 2.2.0
+# 1.7
+#      memory: 2048
+# 2.2.0
+      memory: 4096
 
 provisioner:
   name: ansible_playbook
@@ -22,6 +24,8 @@ provisioner:
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
 
 platforms:
+  - name: ubuntu-18.04
+  - name: ubuntu-16.04
   - name: ubuntu-14.04
 ## bakhti.elk currently not supporting centos
 #  - name: centos-7.1
@@ -30,4 +34,3 @@ suites:
   - name: default
     run_list:
     attributes:
-

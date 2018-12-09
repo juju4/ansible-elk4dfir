@@ -2,12 +2,14 @@
 dist: trusty
 sudo: required
 rvm:
-  - 2.2
+  - 2.5
 
 env:
 ## those images need pre-configuration before being usable (openssh...)
 #  - distribution: centos
 #    version: 7
+  - distribution: ubuntu
+    version: 18.04
   - distribution: ubuntu
     version: 16.04
 #  - distribution: alpine
@@ -41,20 +43,12 @@ before_install:
   - sudo service lxd restart
 
   - sudo pip install ansible
-## need to use chef gem for some reason? BAD PATH https://github.com/chef/chef-dk/issues/15
-#  - chef gem install kitchen
   - gem install kitchen
   - gem install kitchen-ansible
   - gem install kitchen-sync
   - gem install kitchen-lxd_cli
-## Message: Unable to activate kitchen-ansible-0.45.0, because net-ssh-2.9.2 conflicts with net-ssh (~> 3.0)
-#  - chef gem uninstall net-ssh -v 2.9.2 -q ?-y
-#  - chef gem list
   - gem list
   - which kitchen
-#  - which chef
-#  - find /var/lib/gems $HOME/.gem /usr/local/rvm/gems /opt/chefdk/embedded/lib/ruby/gem -iname '*lxd_cli*' || true
-  - wget -q https://releases.hashicorp.com/vagrant/1.9.2/vagrant_1.9.2_x86_64.deb && sudo dpkg -i vagrant_1.9.2_x86_64.deb
 ## ssh key for lxd_cli ?
   - ls ~/.ssh
   - ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -P ""
@@ -72,4 +66,3 @@ script:
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
-

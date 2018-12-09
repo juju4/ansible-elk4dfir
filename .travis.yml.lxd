@@ -2,12 +2,14 @@
 dist: trusty
 sudo: required
 rvm:
-  - 2.2
+  - 2.5
 
 env:
 ## those images need pre-configuration before being usable (openssh...)
 #  - distribution: centos
 #    version: 7
+  - distribution: ubuntu
+    version: 18.04
   - distribution: ubuntu
     version: 16.04
 #  - distribution: alpine
@@ -92,4 +94,3 @@ script:
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
-

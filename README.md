@@ -14,6 +14,7 @@ Preloaded multiple configurations with sometimes adaptations or not:
 ### Ansible
 It was tested on the following versions:
  * 2.2
+ * 2.5
 
 ### Operating systems
 

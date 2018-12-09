@@ -91,4 +91,3 @@ elk4dfir_extra_files:
 #    - logstash-input-relp
 ## https://www.elastic.co/guide/en/logstash/current/plugins-filters-elasticsearch.html
 #    - logstash-filter-elasticsearch
-

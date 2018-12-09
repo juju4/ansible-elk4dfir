@@ -6,4 +6,3 @@
         - openjdk-8-jdk
   roles:
     - juju4.elk4dfir
-

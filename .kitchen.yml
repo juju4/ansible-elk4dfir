@@ -13,7 +13,6 @@ provisioner:
   ansible_verbose: false
   ansible_verbosity: 3
   ansible_extra_flags: <%= ENV['ANSIBLE_EXTRA_FLAGS'] %>
-#  ansible_yum_repo: http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm
 #  require_chef_omnibus: false
   require_ansible_omnibus: true
 #  require_chef_for_busser: false
@@ -22,6 +21,7 @@ provisioner:
 
 ## ELKv5 requires java v8+ (nok trusty, centos6)
 platforms:
+  - name: ubuntu-18.04
   - name: ubuntu-16.04
   - name: centos-7
 #  - name: alpine-3.4
@@ -30,4 +30,3 @@ suites:
   - name: default
     run_list:
     attributes:
-

@@ -6,7 +6,7 @@
   when: ansible_distribution == 'Ubuntu'
 - name: Include version-specific variables for RedHat
   include_vars: "RedHat-{{ ansible_distribution_version.split('.')[0] }}.yml"
-  when: ansible_os_family == "RedHat" or ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_os_family == "RedHat"
 
 - include: java-security.yml
 
@@ -75,9 +75,14 @@
 #    replace: "{{ item.rep }}"
 #    backup: yes
 #  with_items:
-#    - { d: "{{ elk4dfir_examples }}/sof-elk/configfiles/150-syslog_ssh.conf", re: '/usr/local/share/GeoIP', rep: "{{ elk4dfir_maxmind_path }}" }
-#    - { d: "{{ elk4dfir_examples }}/sof-elk/configfiles/198-syslog_default.conf", re: '/usr/local/share/GeoIP', rep: "{{ elk4dfir_maxmind_path }}" }
+#    - { d: "{{ elk4dfir_examples }}/sof-elk/configfiles/150-syslog_ssh.conf",
+#        re: '/usr/local/share/GeoIP',
+#        rep: "{{ elk4dfir_maxmind_path }}"
+#      }
+#    - { d: "{{ elk4dfir_examples }}/sof-elk/configfiles/198-syslog_default.conf",
+#        re: '/usr/local/share/GeoIP',
+#        rep: "{{ elk4dfir_maxmind_path }}"
+#      }
 
 - include: testing.yml
   when: elk4dfir_testing
-
