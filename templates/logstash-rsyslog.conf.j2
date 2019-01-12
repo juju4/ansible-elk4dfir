@@ -59,7 +59,7 @@ filter {
     }
     geoip {
         source => "ip"
-        database => "/var/maxmind/GeoLiteCity.dat"
+        database => "/var/maxmind/GeoLite2-City.mmdb"
     }
     dns {
         reverse => ["ip"]
@@ -69,7 +69,7 @@ filter {
   geoip {
     source => "clientip"
     target => "geoip"
-    database => "/var/maxmind/GeoLiteCity.dat"
+    database => "/var/maxmind/GeoLite2-City.mmdb"
     add_field => [ "[geoip][coordinates]", "%{[geoip][longitude]}" ]
     add_field => [ "[geoip][coordinates]", "%{[geoip][latitude]}"  ]
   }
