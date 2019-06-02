@@ -1,6 +1,7 @@
 ---
 
-- include_vars: main.yml
+- name: Include general variables
+  include_vars: main.yml
 - name: Include version-specific variables for Ubuntu.
   include_vars: "{{ ansible_distribution }}-{{ ansible_distribution_version }}.yml"
   when: ansible_distribution == 'Ubuntu'
@@ -36,11 +37,14 @@
 
 - name: ensure git is available
   package: name=git state=present
+  register: pkg_result
+  until: pkg_result is success
 
 - name: git clone examples config repositories
   git:
-    repo: "{{ item }}"
-    dest: "{{ elk4dfir_examples }}/{{ item | regex_replace('^.*/([^/].*)$', '\\1') | regex_replace('.git$', '') }}"
+    repo: "{{ item.repo }}"
+    dest: "{{ elk4dfir_examples }}/{{ item.repo | regex_replace('^.*/([^/].*)$', '\\1') | regex_replace('.git$', '') }}"
+    version: "{{ item.version }}"
     force: no
   with_items: "{{ elk4dfir_gitrepos }}"
   become: yes

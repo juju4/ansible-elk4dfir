@@ -8,6 +8,8 @@
 
 - name: ensure rng-tools are present
   package: name=rng-tools state=present
+  register: pkg_result
+  until: pkg_result is success
 
 - name: force /dev/urandom as entropy source for java
   lineinfile:

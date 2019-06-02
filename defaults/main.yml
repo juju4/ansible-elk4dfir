@@ -10,12 +10,12 @@ elk4dfir_maxmind_path: '/var/maxmind'
 elk4dfir_testing: false
 
 elk4dfir_gitrepos:
-    - https://github.com/harrytruman/logstash-vmware.git
-    - https://github.com/cvandeplas/ELK-forensics.git
+    - { repo: 'https://github.com/harrytruman/logstash-vmware.git', version: '647e692382b1f1e187c14b20b70c96c87c531ce6' }
+    - { repo: 'https://github.com/cvandeplas/ELK-forensics.git', version: '5ac7bf4f78179e70a6ddc0cbc0dd14a924597b18' }
 #    - https://github.com/Yelp/elastalert.git
 ## use fork for elk5 compatibility
 #    - https://github.com/philhagen/sof-elk.git
-    - https://github.com/juju4/sof-elk.git
+    - { repo: 'https://github.com/juju4/sof-elk.git', version: '67b2b4f415b2f9ca1f0733611fa4b849203089e0' }
 
 #https://www.nginx.com/blog/monitoring-nginx-plus-statistics-elk/
 #http://logz.io/blog/nginx-log-analysis/
