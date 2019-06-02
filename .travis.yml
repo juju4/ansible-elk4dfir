@@ -1,8 +1,8 @@
 ---
-dist: trusty
+dist: xenial
 sudo: required
 rvm:
-  - 2.5
+  - 2.6
 
 env:
 ## those images need pre-configuration before being usable (openssh...)
@@ -23,11 +23,8 @@ before_install:
   - find -ls
 ## use appropriate role path and not github name
   - "[ -f get-dependencies.sh ] && sh -x get-dependencies.sh"
-## No Xenial, https://github.com/travis-ci/travis-ci/issues/5821
-#  - sudo apt install lxd
-  - echo "deb http://archive.ubuntu.com/ubuntu trusty-backports main restricted universe multiverse" | sudo tee /etc/apt/sources.list.d/trusty-backports.list
   - sudo apt-get update -qq
-  - sudo apt -t trusty-backports -y install lxd acl -q
+  - sudo apt -y install lxd acl -q
 ## change of group implies logout+login to apply... can't do with travis = run as root (sic)    = use 'newgrp lxd' ? = travis stalling all ...
 ## https://github.com/travis-ci/travis-ci/issues/1839   or chain: sudo -E su $USER -c "..."
   - sudo usermod -G lxd travis
@@ -89,7 +86,7 @@ script:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ansible-playbook -i inventory --connection=local --sudo /etc/ansible/roles/juju4.elk4dfir/test/integration/default/default.yml" > /tmp/idempotency.log
   - "grep -q 'changed=0.*failed=0' /tmp/idempotency.log && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && cat /tmp/idempotency.log && exit 0)"
 
-  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- time sh -x /etc/ansible/roles/juju4.elk4dfir/test/integration/default/serverspec/run-local-tests.sh"
+  - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- /etc/ansible/roles/juju4.elk4dfir/test/integration/default/serverspec/run-local-tests.sh"
 
 after_script:
   - sudo -E su $USER -c "lxc exec run-${distribution}-${version//./} -- ps axu"
