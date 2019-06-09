@@ -40,8 +40,8 @@ elk4dfir_config_files:
     - logstash-osquery.conf
     - logstash-ossec.conf
     - logstash-rsyslog.conf
-    - logstash-exim.conf
-    - logstash-postfix.conf
+#    - logstash-exim.conf
+#    - logstash-postfix.conf
 
 elk4dfir_config_enable:
     - "{{ elk4dfir_examples }}/sof-elk/configfiles/010-syslog-input.conf"
@@ -54,7 +54,7 @@ elk4dfir_config_enable:
     - "{{ elk4dfir_examples }}/sof-elk/configfiles/198-syslog_default.conf"
     - "{{ elk4dfir_examples }}/sof-elk/configfiles/199-syslog_final.conf"
     - "{{ elk4dfir_examples }}/logstash-osquery.conf"
-    - "{{ elk4dfir_examples }}/logstash-exim.conf"
+#    - "{{ elk4dfir_examples }}/logstash-exim.conf"
 
 #elk4dfir_config_disable: []
 elk4dfir_config_disable:
