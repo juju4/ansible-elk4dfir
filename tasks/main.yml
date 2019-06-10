@@ -89,4 +89,4 @@
 #      }
 
 - include: testing.yml
-  when: elk4dfir_testing
+  when: elk4dfir_testing|bool
