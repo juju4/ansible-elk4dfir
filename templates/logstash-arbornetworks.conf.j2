@@ -59,6 +59,7 @@ filter {
     date { 
       match => [ "time_stop", "UNIX" ]
     }
+{% if elk4dfir_maxmind is defined and elk4dfir_maxmind %}
     geoip {
         source => "res_ip"
         target => "geoip"
@@ -69,6 +70,7 @@ filter {
     mutate {
         convert => [ "[geoip][coordinates]", "float"]
     }
+{% endif %}
     ## https://www.elastic.co/guide/en/logstash/current/plugins-filters-cidr.html
   #  cidr {
   #      add_tag => [ "linklocal" ]
