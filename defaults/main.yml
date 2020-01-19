@@ -52,7 +52,7 @@ elk4dfir_config_enable:
     - "{{ elk4dfir_examples }}/sof-elk/configfiles/130-syslog_bindquerylog.conf"
 #    - "{{ elk4dfir_examples }}/sof-elk/configfiles/150-syslog_ssh.conf"
     - "{{ elk4dfir_examples }}/sof-elk/configfiles/160-syslog_pam.conf"
-    - "{{ elk4dfir_examples }}/sof-elk/configfiles/198-syslog_default.conf"
+#    - "{{ elk4dfir_examples }}/sof-elk/configfiles/198-syslog_default.conf"
     - "{{ elk4dfir_examples }}/sof-elk/configfiles/199-syslog_final.conf"
     - "{{ elk4dfir_examples }}/logstash-osquery.conf"
 #    - "{{ elk4dfir_examples }}/logstash-exim.conf"
