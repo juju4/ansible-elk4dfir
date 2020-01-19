@@ -5,6 +5,7 @@ elk4dfir_patterns_dir: '/etc/logstash/patterns'
 elk4dfir_templates_dir: '/etc/logstash/templates'
 ## where to put files you want to add manually?
 elk4dfir_manual_parsing_dir: '/usr/local/logstash-syslog'
+elk4dfir_maxmind: false
 elk4dfir_maxmind_path: '/var/maxmind'
 ## if enabled, will push some logs into elk so we can validate them with serverspec
 elk4dfir_testing: false

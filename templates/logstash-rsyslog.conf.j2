@@ -57,15 +57,18 @@ filter {
         clear_interval => 60
         add_field => ["source", "beuha"] # it's a bug, I should use this : "%{[logsource]}"]
     }
+{% if elk4dfir_maxmind is defined and elk4dfir_maxmind %}
     geoip {
         source => "ip"
         database => "/var/maxmind/GeoLite2-City.mmdb"
     }
+{% endif %}
     dns {
         reverse => ["ip"]
     }
   }
 
+{% if elk4dfir_maxmind is defined and elk4dfir_maxmind %}
   geoip {
     source => "clientip"
     target => "geoip"
@@ -77,6 +80,7 @@ filter {
     add_field => [ "src_ip", "%{clientip}" ]
     convert => [ "[geoip][coordinates]", "float" ]
   }
+{% endif %}
 }
 
 output {
